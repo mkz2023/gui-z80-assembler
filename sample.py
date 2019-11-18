@@ -1,8 +1,13 @@
-#!/usr/bin/python3
+# !/usr/bin/python3.7
+
 from tkinter import *
-root = Tk()
-label = Label( root, text="esto es un label" )
-button = Button( root, text="texto del boton" )
-label.pack()
-button.pack()
-root.mainloop()
+
+raiz= Tk()
+raiz.title("Ensamblador para z-80 en python")
+framePrincipal=Frame(raiz)
+framePrincipal.config(background="blue")
+framePrincipal.config(width="600", height="600")
+framePrincipal.pack()
+
+
+raiz.mainloop()
