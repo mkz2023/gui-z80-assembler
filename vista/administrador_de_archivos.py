@@ -31,6 +31,7 @@ class AdministradorArchivos:
             lineas=archivo.readlines()
             #print(lineas)
             # ahora regresamos la lista a la funcion que llamo a este metodo
+            archivo.close()
             return lineas
 
 
