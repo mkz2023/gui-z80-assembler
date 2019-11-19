@@ -82,8 +82,9 @@ class Vista:
     # esta funcion lee el codigo ensamblador dede el Text ensamblador y se lo pasa a la funcion que lo requiera en una lista
     def leerCodigoEnsamblador(self):
         contenido=self.textoCodigoEnsamblador.get("1.0",'end-1c')
-        print(contenido)
-        #self.textoCodigoEnsamblador.delete('1.0','end-1c')
+        return contenido
+        # falta pasar el contenido de este string a una lista
+
 
 
 
@@ -96,22 +97,26 @@ class Vista:
         contenido = ""
         for var in lista:
             contenido = str(contenido) + str(var)
-        self.textoCodigoEnsamblador.insert("0.0", contenido)
-
-
-        
+        self.textoCodigoEnsamblador.insert("0.0", contenido)        
 
     def botonLimpiarPulsado(self):
-        print("se ha pulsado del boton limpiar")
+        # se limpiara el contenido del Text donde esta el codigo ensamblador
+        self.textoCodigoEnsamblador.delete("1.0", END)
+        # tambien limpia el TEXT del codigo EX y el codigo LST
+        self.textoCodigoEX.delete('1.0',END)
+        self.textoCodigoLST.delete('1.0',END)
 
     def botonGuardarpulsado(self):
         print("se ha pulsado el boton guardar ensamblador")
     
     def botonEnsamblarPulsado(self):
-        print("se ha pulsado el boton Ensamblar")
+        contenido = self.leerCodigoEnsamblador()
+        # funcionalidad provicional
+        self.textoCodigoEX.insert('0.0', contenido)
+        self.textoCodigoLST.insert('0.0',contenido)
     
     def botonGuardarEXpulsado(self):
-        print("se ha pulsado el boton guardar EX")
+        print("Boton guardar EX pulsado")
 
     def botonGuardarLSTpulsado(self):
         print("se ha pulsado el boton guardar LST")
