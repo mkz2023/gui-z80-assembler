@@ -26,7 +26,7 @@ class Vista:
         scrollEnsamblador.grid(row=1, column=5, sticky="nsew")
         textoCodigoEnsamblador.config(yscrollcommand=scrollEnsamblador.set)
 
-        botonCargar = Button(framePrincipal, text="Cargar")
+        botonCargar = Button(framePrincipal, text="Cargar", command=lambda : print("BotonCargar ha sido pulsado"))
         botonCargar.grid(row=2, column=0, padx=5, pady=5)
         botonLimpiar = Button(framePrincipal, text="Limpiar")
         botonLimpiar.grid(row=2, column=1, padx=5, pady=5)
@@ -58,5 +58,37 @@ class Vista:
         botonGuardarLST.grid(row=8, column=4, padx=5, pady=5)
         raiz.mainloop()
 
-vista1=Vista()
-vista1.crearVentana()
+   
+    # esta funcion lee el archivo .asm y regresa una lista con el contenido del archivo linea a linea
+    def leerArchivoEnsamblador(self):
+        print("ahora vamnos a leer el archivo ensamblador")
+
+        rutaArchivo = filedialog.askopenfilename(title="Selecciona el archivo ASM para abrir", filetypes=(("Archivos Ensamblador","*.ASM"),("Todos", "*.*")))
+        #una ves tenemos la ruta procedemos a leer el archivo y regresar el contenido en una lista
+        if rutaArchivo == None:
+            print("No se obtuvo la ruta")
+        else:
+            archivo = open(rutaArchivo, "r")
+            lineas=archivo.readlines()
+            #print(lineas)
+            # ahora regresamos la lista a la funcion que llamo a este metodo
+            archivo.close()
+            return lineas
+
+    # a continuacion se crean las funciones que responden a la pulsacion de los botones
+    def botonCargarPulsado(self):
+        print("se ha pulsado el boton cargar")
+        contenido = self.leerArchivoEnsamblador()
+
+    def botonLimpiarPulsado(self):
+        print("se ha pulsado del boton limpiar")
+
+    def botonGuardarpulsado(self):
+        print("se ha pulsado el boton guardar ensamblador")
+    
+    def botonGuardarEXpulsado(self):
+        print("se ha pulsado el boton guardar EX")
+
+    def botonGuardarLSTpulsado(self):
+        print("se ha pulsado el boton guardar LST")
+         
