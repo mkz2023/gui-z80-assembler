@@ -11,7 +11,7 @@ class Vista:
     def __init__(self):
         self.raiz= Tk()
         self.raiz.title("Ensamblador para z-80 en python")
-        self.raiz.iconbitmap('./imgs/logo-ingenieria.ico')
+        #self.raiz.iconbitmap('./imgs/logo-ingenieria.ico') # esta solo funciona en widows
         self.framePrincipal=Frame(self.raiz)
         self.framePrincipal.config(background="#A79A97")
         #framePrincipal.config(width="600", height="600")
@@ -33,6 +33,8 @@ class Vista:
         self.botonGuardar.grid(row=2, column=2, padx=5, pady=5)
         self.botodEnsamblar=Button(self.framePrincipal, text="Ensamblar", command=lambda : self.botonEnsamblarPulsado())
         self.botodEnsamblar.grid(row=2, column=3, padx=5, pady=5)
+        self.botonSimular=Button(self.framePrincipal, text="simular", command=lambda: self.botonSimularPuldado())
+        self.botonSimular.grid(row=2, column=4, padx=5, pady=5)
 
         self.labelCodigoEX = Label(self.framePrincipal, text="Codigo EX o herrores despues de ensamblar")
         self.labelCodigoEX.grid(row=3, column=0, columnspan=5, padx=5, pady=5)
@@ -59,10 +61,16 @@ class Vista:
 
     
     def crearVentana(self):
-        self.framePrincipal.pack()
+        self.framePrincipal.grid()
         self.raiz.mainloop()
-
-   
+        # while True:
+        #     self.raiz.update_idletasks()
+        #     self.raiz.update()
+    
+    def actualizarVentana( self ):
+        self.raiz.update_idletasks()
+        self.raiz.update()
+    
     # esta funcion lee el archivo .asm y regresa una lista con el contenido del archivo linea a linea
     def leerArchivoEnsamblador(self):
         print("ahora vamnos a leer el archivo ensamblador")
@@ -115,9 +123,24 @@ class Vista:
         self.textoCodigoEX.insert('0.0', contenido)
         self.textoCodigoLST.insert('0.0',contenido)
     
+    def botonSimularPuldado(self):
+        print("Se ha pulsado el boton simular")
+    
     def botonGuardarEXpulsado(self):
         print("Boton guardar EX pulsado")
 
     def botonGuardarLSTpulsado(self):
         print("se ha pulsado el boton guardar LST")
          
+    # funciones para manejar el comportamiento de la interfas
+    def ocultarPrimeraSeccion(self):
+        self.labelCodigoEnsamblador.grid_remove()
+        self.textoCodigoEnsamblador.grid_remove()
+
+    def mostrarPrimeraSeccion(self):
+        self.labelCodigoEnsamblador.grid()
+        self.labelCodigoEnsamblador.grid()
+
+    # funcion que regresa un apuntador al objeto raiz
+    def getRaiz(self):
+        return self
