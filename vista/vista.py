@@ -7,6 +7,7 @@ from tkinter import *
 from tkinter import filedialog
 from io import open
 
+
 class Vista:
     def __init__(self):
         self.raiz= Tk()
@@ -31,8 +32,8 @@ class Vista:
         self.botonLimpiar.grid(row=2, column=1, padx=5, pady=5)
         self.botonGuardar=Button(self.framePrincipal, text="Guardar", command=lambda : self.botonGuardarpulsado())
         self.botonGuardar.grid(row=2, column=2, padx=5, pady=5)
-        self.botodEnsamblar=Button(self.framePrincipal, text="Ensamblar", command=lambda : self.botonEnsamblarPulsado())
-        self.botodEnsamblar.grid(row=2, column=3, padx=5, pady=5)
+        self.botonEnsamblar=Button(self.framePrincipal, text="Ensamblar", command=lambda : self.botonEnsamblarPulsado())
+        self.botonEnsamblar.grid(row=2, column=3, padx=5, pady=5)
         self.botonSimular=Button(self.framePrincipal, text="simular", command=lambda: self.botonSimularPuldado())
         self.botonSimular.grid(row=2, column=4, padx=5, pady=5)
 
@@ -62,6 +63,10 @@ class Vista:
     
     def crearVentana(self):
         self.framePrincipal.grid()
+        # debe inicia con las 3 secciones ocultas
+        self.ocultarPrimeraSeccion()
+        self.ocultarSegundaSeccion()
+        self.ocultarTerceraSeccion()
         self.raiz.mainloop()
         # while True:
         #     self.raiz.update_idletasks()
@@ -105,7 +110,12 @@ class Vista:
         contenido = ""
         for var in lista:
             contenido = str(contenido) + str(var)
-        self.textoCodigoEnsamblador.insert("0.0", contenido)        
+        self.textoCodigoEnsamblador.insert("0.0", contenido)
+        # mostrar la primera seccion
+        self.mostrarPrimeraSeccion()
+        #ocultar las demas
+        self.ocultarSegundaSeccion()
+        self.ocultarTerceraSeccion()        
 
     def botonLimpiarPulsado(self):
         # se limpiara el contenido del Text donde esta el codigo ensamblador
@@ -113,34 +123,129 @@ class Vista:
         # tambien limpia el TEXT del codigo EX y el codigo LST
         self.textoCodigoEX.delete('1.0',END)
         self.textoCodigoLST.delete('1.0',END)
+        #ocultar las secciones
+        self.ocultarPrimeraSeccion()
+        self.ocultarSegundaSeccion()
+        self.ocultarTerceraSeccion()
 
     def botonGuardarpulsado(self):
-        print("se ha pulsado el boton guardar ensamblador")
+        #print("se ha pulsado el boton guardar ensamblador")
+        #ruta = self.getRutaGuardarEnsamblador()
+        self.guardarEnsamblador()
     
     def botonEnsamblarPulsado(self):
         contenido = self.leerCodigoEnsamblador()
         # funcionalidad provicional
+        # ya no tiene caso mostrar el codigo fuente
+        self.ocultarPrimeraSeccion()
+        #self.botonEnsamblar.configure(state=NORMAL)
+        self.botonLimpiar.configure(state=NORMAL)
+        self.mostrarSegundaSeccion()
+        self.mostrarTerceraSeccion()
         self.textoCodigoEX.insert('0.0', contenido)
         self.textoCodigoLST.insert('0.0',contenido)
     
     def botonSimularPuldado(self):
+        # obtener el conteido de ...
         print("Se ha pulsado el boton simular")
     
     def botonGuardarEXpulsado(self):
-        print("Boton guardar EX pulsado")
+        self.guardarEX()
 
     def botonGuardarLSTpulsado(self):
-        print("se ha pulsado el boton guardar LST")
+        self.guardarLST()
          
     # funciones para manejar el comportamiento de la interfas
     def ocultarPrimeraSeccion(self):
         self.labelCodigoEnsamblador.grid_remove()
         self.textoCodigoEnsamblador.grid_remove()
+        self.scrollEnsamblador.grid_remove()
+        self.botonGuardar.configure(state=DISABLED)
+        self.botonEnsamblar.configure(state=DISABLED)
+        self.botonLimpiar.configure(state=DISABLED)
+        self.botonSimular.configure(state=DISABLED)
+
 
     def mostrarPrimeraSeccion(self):
         self.labelCodigoEnsamblador.grid()
-        self.labelCodigoEnsamblador.grid()
+        self.textoCodigoEnsamblador.grid()
+        self.scrollEnsamblador.grid()
+        self.botonGuardar.configure(state=NORMAL)
+        self.botonEnsamblar.configure(state=NORMAL)
+        self.botonLimpiar.configure(state=NORMAL)
+        self.botonSimular.configure(state=DISABLED)
 
-    # funcion que regresa un apuntador al objeto raiz
-    def getRaiz(self):
-        return self
+    
+    def ocultarSegundaSeccion(self):
+        self.labelCodigoEX.grid_remove()
+        self.textoCodigoEX.grid_remove()
+        self.botonGuardarEX.grid_remove()
+        self.scrollEX.grid_remove()
+    
+    def mostrarSegundaSeccion(self):
+        self.labelCodigoEX.grid()
+        self.textoCodigoEX.grid()
+        self.botonGuardarEX.grid()
+        self.scrollEX.grid()
+        self.botonSimular.configure(state=NORMAL)
+    
+    def ocultarTerceraSeccion(self):
+        self.labelCodigoLST.grid_remove()
+        self.textoCodigoLST.grid_remove()
+        self.botonGuardarLST.grid_remove()
+        self.scrollLST.grid_remove()
+    
+    def mostrarTerceraSeccion(self):
+        self.labelCodigoLST.grid()
+        self.textoCodigoLST.grid()
+        self.botonGuardarLST.grid()
+        self.scrollLST.grid()
+
+    # funciones para guardar archivos
+    def getRutaGuardarEnsamblador(self):
+        #print("pregunta donde guardar el ensambldor")
+        ruta = filedialog.asksaveasfile()
+        if ruta is not None:
+            #print(ruta)
+            #direccion =str(ruta.get(1.0, END))
+            #print(direccion)
+            #return direccion
+            return ruta
+    
+    def getRutaGuardarEX(self):
+        ruta=filedialog.asksaveasfile()
+        if ruta is not None:
+            return ruta
+
+    
+    def getRutaGuardarLST(self):
+        ruta=filedialog.asksaveasfile()
+        if ruta is not None:
+            return ruta
+
+    def guardarEnsamblador(self):
+        ruta=self.getRutaGuardarEnsamblador()
+        path=ruta.name
+        #print("path: ", path)
+        archivo = open(path,'w')
+        contenido=self.textoCodigoEnsamblador.get('0.0','end-1c')
+        #print(contenido)
+        archivo.write(contenido)
+        archivo.close()
+    
+    def guardarEX(self):
+        ruta=self.getRutaGuardarEX()
+        path=ruta.name
+        archivo=open(path,'w')
+        contenido=self.textoCodigoEX.get('0.0','end-1c')
+        archivo.write(contenido)
+        archivo.close()
+  
+    def guardarLST(self):
+        ruta=self.getRutaGuardarLST()
+        path=ruta.name
+        archivo = open(path,'w')
+        contenido=self.textoCodigoLST.get('0.0','end-1c')
+        archivo.write(contenido)
+        archivo.close()
+    

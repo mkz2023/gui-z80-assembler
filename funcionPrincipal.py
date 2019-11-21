@@ -12,10 +12,12 @@ vista = Vista()
 
 
 
-raiz = vista.getRaiz()
-raiz.ocultarPrimeraSeccion()
+#raiz = vista.getRaiz()
+#raiz.ocultarPrimeraSeccion()
+#raiz.ocultarSegundaSeccion()
+#raiz.ocultarTerceraSeccion()
 
-hilo = threading.Thread()
+#hilo = threading.Thread()
 
 vista.crearVentana()
 #vista.actualizarVentana()
