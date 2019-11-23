@@ -1,6 +1,7 @@
 #! /usr/bin/python3
 # from paquete.archivo import Clase
-from vista.vista import Vista
+from vista import Vista
+#import vista
 #import threading
 
 #from vista.administrador_de_archivos import AdministradorArchivos

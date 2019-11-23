@@ -6,6 +6,12 @@
 from tkinter import *
 from tkinter import filedialog
 from io import open
+import firstPassParser
+import lexerIntento2
+
+import sys
+import lexerIntento2
+
 
 
 class Vista:
@@ -34,10 +40,10 @@ class Vista:
         self.botonGuardar.grid(row=2, column=2, padx=5, pady=5)
         self.botonEnsamblar=Button(self.framePrincipal, text="Ensamblar", command=lambda : self.botonEnsamblarPulsado())
         self.botonEnsamblar.grid(row=2, column=3, padx=5, pady=5)
-        self.botonSimular=Button(self.framePrincipal, text="simular", command=lambda: self.botonSimularPuldado())
+        self.botonSimular=Button(self.framePrincipal, text="simular", command=lambda : self.botonSimularPulsado())
         self.botonSimular.grid(row=2, column=4, padx=5, pady=5)
 
-        self.labelCodigoEX = Label(self.framePrincipal, text="Codigo EX o herrores despues de ensamblar")
+        self.labelCodigoEX = Label(self.framePrincipal, text="Codigo EX")
         self.labelCodigoEX.grid(row=3, column=0, columnspan=5, padx=5, pady=5)
         self.textoCodigoEX = Text(self.framePrincipal)
         self.textoCodigoEX.config(height=10)
@@ -48,7 +54,7 @@ class Vista:
         self.botonGuardarEX = Button(self.framePrincipal, text="Guardar codigo EX", command=lambda : self.botonGuardarEXpulsado())
         self.botonGuardarEX.grid(row=5, column=4, padx=5, pady=5)
 
-        self.labelCodigoLST= Label(self.framePrincipal, text="Codigo LST o herrores despues de ensamblar")
+        self.labelCodigoLST= Label(self.framePrincipal, text="Codigo LST")
         self.labelCodigoLST.grid(row=6, column=0, columnspan=5, padx=5, pady=5)
         self.textoCodigoLST = Text(self.framePrincipal)
         self.textoCodigoLST.config(height=10)
@@ -58,7 +64,14 @@ class Vista:
         self.textoCodigoLST.config(yscrollcommand=self.scrollLST.set)
         self.botonGuardarLST = Button(self.framePrincipal, text="Guardar codigo LST ", command=lambda : self.botonGuardarLSTpulsado())
         self.botonGuardarLST.grid(row=8, column=4, padx=5, pady=5)
-        
+
+        self.labelCodigoErrores = Label(self.framePrincipal, text="Errores al procesar el codigo")
+        self.labelCodigoErrores.grid(row=9, column=0, columnspan=5, padx=5, pady=5)
+        self.textoCodigoErrores = Text(self.framePrincipal)
+        self.textoCodigoErrores.grid(row=10, column=0, columnspan=5, padx=5, pady=5)
+        self.scrollErrores=Scrollbar(self.framePrincipal, command=self.textoCodigoErrores.yview)
+        self.scrollErrores.grid(row=10, column=5, sticky="nsew")
+        self.textoCodigoErrores.config(yscrollcommand=self.scrollErrores.set)        
 
     
     def crearVentana(self):
@@ -67,18 +80,16 @@ class Vista:
         self.ocultarPrimeraSeccion()
         self.ocultarSegundaSeccion()
         self.ocultarTerceraSeccion()
+        self.ocultarCuartaSeccion()
         self.raiz.mainloop()
         # while True:
         #     self.raiz.update_idletasks()
         #     self.raiz.update()
     
-    def actualizarVentana( self ):
-        self.raiz.update_idletasks()
-        self.raiz.update()
     
     # esta funcion lee el archivo .asm y regresa una lista con el contenido del archivo linea a linea
     def leerArchivoEnsamblador(self):
-        print("ahora vamnos a leer el archivo ensamblador")
+        #print("ahora vamnos a leer el archivo ensamblador")
 
         rutaArchivo = filedialog.askopenfilename(title="Selecciona el archivo ASM para abrir", filetypes=(("asm","*.txt"),("Todos", "*.*")))
         #una ves tenemos la ruta procedemos a leer el archivo y regresar el contenido en una lista
@@ -103,19 +114,29 @@ class Vista:
 
     # a continuacion se crean las funciones que responden a la pulsacion de los botones
     def botonCargarPulsado(self):
-        print("se ha pulsado el boton cargar")
-        lista = self.leerArchivoEnsamblador()
+        #print("se ha pulsado el boton cargar")
+        #lista = self.leerArchivoEnsamblador()
         # a continuacion se agrega el contenido del archivo leido en el Text del codigo ensamblador
         #self.textoCodigoEnsamblador.insert(0.0,lista)
-        contenido = ""
-        for var in lista:
-            contenido = str(contenido) + str(var)
-        self.textoCodigoEnsamblador.insert("0.0", contenido)
+        #contenido = ""
+        #for var in lista:
+        #    contenido = str(contenido) + str(var)
+        #self.textoCodigoEnsamblador.insert("0.0", contenido)
         # mostrar la primera seccion
         self.mostrarPrimeraSeccion()
         #ocultar las demas
         self.ocultarSegundaSeccion()
-        self.ocultarTerceraSeccion()        
+        self.ocultarTerceraSeccion()
+        self.ocultarCuartaSeccion()
+        # aqui va el codigo de hector
+        lol = filedialog.askopenfilename(title="Selecciona el archivo ASM para abrir", filetypes=(("asm","*.txt"),("Todos", "*.*")))
+        with open(lol) as entrada:
+            ListaInstrucciones = entrada.readlines()
+        ListaInstrucciones = [x.strip("\n") for x in ListaInstrucciones]
+        
+        # insertar ListaInstrucciones en seccion 1
+        self.setCodigoEnsamblador(ListaInstrucciones)
+
 
     def botonLimpiarPulsado(self):
         # se limpiara el contenido del Text donde esta el codigo ensamblador
@@ -123,10 +144,13 @@ class Vista:
         # tambien limpia el TEXT del codigo EX y el codigo LST
         self.textoCodigoEX.delete('1.0',END)
         self.textoCodigoLST.delete('1.0',END)
+        # tambien borrar el codigo de herrores
+        self.textoCodigoErrores.delete('1.0', END)
         #ocultar las secciones
         self.ocultarPrimeraSeccion()
         self.ocultarSegundaSeccion()
         self.ocultarTerceraSeccion()
+        self.ocultarCuartaSeccion()
 
     def botonGuardarpulsado(self):
         #print("se ha pulsado el boton guardar ensamblador")
@@ -142,12 +166,27 @@ class Vista:
         self.botonLimpiar.configure(state=NORMAL)
         self.mostrarSegundaSeccion()
         self.mostrarTerceraSeccion()
-        self.textoCodigoEX.insert('0.0', contenido)
-        self.textoCodigoLST.insert('0.0',contenido)
+        #self.textoCodigoEX.insert('0.0', contenido)
+        self.setCodigoEX(contenido)
+        #self.textoCodigoLST.insert('0.0',contenido)
+        self.setCodigoLST(contenido)
+        #aqui va el codigo de hector
+        archivo = "z80_table.txt"
+        ListaInstrucciones = self.leerCodigoEnsamblador()
+        #tokenList,abstractTokenList,simTable=lexerIntento2.run(ListaInstrucciones)
+        #firstPassParser.run(archivo,tokenList,abstractTokenList,simTable)
+        #
     
-    def botonSimularPuldado(self):
+        
+
+
+    
+    def botonSimularPulsado(self):
         # obtener el conteido de ...
-        print("Se ha pulsado el boton simular")
+        #
+        # print("Se ha pulsado el boton simular")
+        # funcionalidad simulada
+        self.funcionError()
     
     def botonGuardarEXpulsado(self):
         self.guardarEX()
@@ -201,51 +240,85 @@ class Vista:
         self.botonGuardarLST.grid()
         self.scrollLST.grid()
 
+    def ocultarCuartaSeccion(self):
+        self.labelCodigoErrores.grid_remove()
+        self.textoCodigoErrores.grid_remove()
+        self.scrollErrores.grid_remove()
+
+    def mostrarCuartaSeccion(self):
+        self.labelCodigoErrores.grid()
+        self.textoCodigoErrores.grid()
+        self.scrollErrores.grid()
+
     # funciones para guardar archivos
     def getRutaGuardarEnsamblador(self):
         #print("pregunta donde guardar el ensambldor")
         ruta = filedialog.asksaveasfile()
         if ruta is not None:
-            #print(ruta)
-            #direccion =str(ruta.get(1.0, END))
-            #print(direccion)
-            #return direccion
-            return ruta
+            path=ruta.name
+            return path # string que es el path
     
     def getRutaGuardarEX(self):
         ruta=filedialog.asksaveasfile()
         if ruta is not None:
-            return ruta
+            path=ruta.name
+            return path
 
     
     def getRutaGuardarLST(self):
         ruta=filedialog.asksaveasfile()
         if ruta is not None:
-            return ruta
+            path = ruta.name
+            return path
 
     def guardarEnsamblador(self):
-        ruta=self.getRutaGuardarEnsamblador()
-        path=ruta.name
-        #print("path: ", path)
+        path=self.getRutaGuardarEnsamblador()
         archivo = open(path,'w')
         contenido=self.textoCodigoEnsamblador.get('0.0','end-1c')
-        #print(contenido)
         archivo.write(contenido)
         archivo.close()
     
     def guardarEX(self):
-        ruta=self.getRutaGuardarEX()
-        path=ruta.name
+        path=self.getRutaGuardarEX()
         archivo=open(path,'w')
         contenido=self.textoCodigoEX.get('0.0','end-1c')
         archivo.write(contenido)
         archivo.close()
   
     def guardarLST(self):
-        ruta=self.getRutaGuardarLST()
-        path=ruta.name
+        path=self.getRutaGuardarLST()
         archivo = open(path,'w')
         contenido=self.textoCodigoLST.get('0.0','end-1c')
         archivo.write(contenido)
         archivo.close()
     
+    def funcionError(self):
+        #funcion corre en el caso de que el codigo del usuario
+        #genere un problema y no se pueda continuar
+        # -> llamar una pantalla de errores
+        #segunda y tercer pantalla no siven
+        self.ocultarPrimeraSeccion()
+        self.ocultarSegundaSeccion()
+        self.ocultarTerceraSeccion()
+        #botones disponibles
+        self.botonLimpiar.configure(state=NORMAL)
+        #mostrar cuarta pantalla
+        self.mostrarCuartaSeccion()
+    
+    # funciones para settear el contenido de las
+    #areas de texto
+    def setCodigoEnsamblador(self, contenido):
+        # asumiendo que es un string
+        self.textoCodigoEnsamblador.insert('0.0', contenido)
+    
+    def setCodigoEX(self, contenido):
+        #asumiendo que es un string
+        self.textoCodigoEX.insert('0.0', contenido)
+    
+    def setCodigoLST(self,contenido):
+        self.textoCodigoLST.insert('0.0', contenido)
+    
+    def setCodigoError(self, contenido):
+        self.labelCodigoErrores.insert('0.0', contenido)
+
+    # seccion de integracion con la parte de bajo nivel
